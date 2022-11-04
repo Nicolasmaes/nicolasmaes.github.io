@@ -141,6 +141,9 @@
               "devServerTarget": "app:serve:ci"
             }
           }
+        },
+        "deploy": {
+          "builder": "angular-cli-ghpages:deploy"
         }
       }
     }
@@ -148,7 +151,8 @@
   "cli": {
     "schematicCollections": [
       "@ionic/angular-toolkit"
-    ]
+    ],
+    "analytics": "ae6d8655-d08e-4468-ad37-3cc71d374ad6"
   },
   "schematics": {
     "@ionic/angular-toolkit:component": {
