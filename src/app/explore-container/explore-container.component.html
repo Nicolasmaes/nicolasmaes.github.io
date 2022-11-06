@@ -1,4 +1,54 @@
 <div id="container">
-  <strong>{{ name }}</strong>
-  <p>Explore <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
+  <h1 class="ion-margin">{{ name }}</h1>
+
+  <form (ngSubmit)="onSubmitForm()">
+    <ion-list class="ion-margin">
+
+      <ion-item>
+        <ion-label for="rate" position="floating">Prix d'achat du bien immobilier
+        </ion-label>
+        <ion-input id="rate" name="rate" [(ngModel)]="rate" type="number" [clearInput]="true"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label for="rent" position="floating">Montant du loyer mensuel</ion-label>
+        <ion-input id="rent" name="rent" [(ngModel)]="rent" type="number" (change)="agencyFees()" [clearInput]="true">
+        </ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label for="rentalExpenses" position="floating">Charges locatives annuelles</ion-label>
+        <ion-input id="rentalExpenses" name="rentalExpenses" [(ngModel)]="rentalExpenses" type="number"
+          [clearInput]="true"></ion-input>
+      </ion-item>
+
+
+      <ion-button type="submit">Calculer</ion-button>
+    </ion-list>
+  </form>
+
+  <div class="result" *ngIf="display">
+    <ion-button (click)="emptyForm()">Nouvelle estimation</ion-button>
+
+    <div>
+      <h3>Frais d'agence automatiquement calculés</h3>
+      <p>Première année : {{ firstYearFees }} €</p>
+      <p>Deuxième année : {{ secondYearFees }} €</p>
+      <p>Années suivantes : {{ thirdYearAndAfterFees }} €/an</p>
+    </div>
+    <div class="resultChild">
+      <div>
+        <h3>Revenu net mensuel</h3>
+        <p>Première année : {{ monthlyIncomesArray[0] | number:'1.2-2' }} €</p>
+        <p>Deuxième année : {{ monthlyIncomesArray[1] | number:'1.2-2' }} €</p>
+        <p>Années suivantes : {{ monthlyIncomesArray[2] | number:'1.2-2' }} €/an</p>
+      </div>
+      <div>
+        <h3>Rendement annuel</h3>
+        <p>Première année : {{ annualReturnsArray[0] | number:'1.2-2' }} %</p>
+        <p>Deuxième année : {{ annualReturnsArray[1] | number:'1.2-2' }} %</p>
+        <p>Années suivantes : {{ annualReturnsArray[2] | number:'1.2-2' }} %/an</p>
+      </div>
+    </div>
+  </div>
+
+
 </div>
