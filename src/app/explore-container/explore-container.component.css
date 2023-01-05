@@ -1,0 +1,20 @@
+#container {
+  text-align: center;
+  left: 0;
+  right: 0;
+}
+
+#container a {
+  text-decoration: none;
+}
+
+.resultChild {
+  border: 4px solid white;
+  display: flex;
+  justify-content: space-around;
+}
+@media screen and (max-width: 480px) {
+  .resultChild {
+    flex-direction: column;
+  }
+}/*# sourceMappingURL=explore-container.component.css.map */
