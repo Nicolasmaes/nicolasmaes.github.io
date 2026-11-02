@@ -134,7 +134,8 @@ p { margin: 0; }
 /* Fiche séance */
 .sheet-wrap { position: fixed; inset: 0; z-index: 50; background: rgb(8 14 20 / .5); display: flex; align-items: flex-end; justify-content: center; animation: fade .18s ease-out; }
 .sheet { width: 100%; max-width: 600px; max-height: 92dvh; overflow-y: auto; overscroll-behavior: contain; background: var(--bg); border-radius: 18px 18px 0 0; padding: 8px 18px calc(env(safe-area-inset-bottom) + 28px); animation: up .26s cubic-bezier(.2, .8, .2, 1); outline: none; }
-.sheet-grip { width: 40px; height: 4px; border-radius: 2px; background: var(--line); margin: 0 auto 12px; }
+.sheet-grip { width: 40px; height: 4px; border-radius: 2px; background: var(--line); box-sizing: content-box; background-clip: content-box; padding: 10px 40px; margin: -8px auto 2px; touch-action: none; }
+.sheet-close { position: sticky; top: 8px; float: right; z-index: 1; margin-left: 12px; }
 .sheet-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
 .sheet-head .eyebrow { font-size: .8rem; }
 .sheet-title { font-size: 2rem; font-weight: 700; margin-top: 2px; }

@@ -53,6 +53,15 @@ const PRIORITY: Partial<Record<Session['type'], string>> = {
 
 export function SessionSheet({ week, session, onClose }: { week: Week; session: Session; onClose: () => void }) {
   const ref = useRef<HTMLDivElement>(null)
+  const dragY = useRef<number | null>(null)
+
+  // Glisser la petite barre vers le bas fait descendre la fiche, et la ferme au-delà de 80 px.
+  const moveSheet = (y: number, ms = 0) => {
+    const el = ref.current
+    if (!el) return
+    el.style.transition = ms ? `transform ${ms}ms ease-out` : 'none'
+    el.style.transform = y ? `translateY(${y}px)` : ''
+  }
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
@@ -84,7 +93,25 @@ export function SessionSheet({ week, session, onClose }: { week: Week; session: 
         ref={ref}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="sheet-grip" aria-hidden="true" />
+        <div
+          className="sheet-grip"
+          aria-hidden="true"
+          onTouchStart={(e) => (dragY.current = e.touches[0].clientY)}
+          onTouchMove={(e) => dragY.current !== null && moveSheet(Math.max(0, e.touches[0].clientY - dragY.current))}
+          onTouchEnd={(e) => {
+            if (dragY.current === null) return
+            const dy = e.changedTouches[0].clientY - dragY.current
+            dragY.current = null
+            if (dy < 80) return moveSheet(0, 200)
+            moveSheet(ref.current!.offsetHeight, 200)
+            setTimeout(onClose, 200)
+          }}
+          onTouchCancel={() => {
+            dragY.current = null
+            moveSheet(0, 200)
+          }}
+        />
+        <button className="icon-btn sheet-close" onClick={onClose} aria-label="Fermer">✕</button>
         <div className="sheet-head">
           <div>
             <div className="eyebrow">
@@ -92,7 +119,6 @@ export function SessionSheet({ week, session, onClose }: { week: Week; session: 
             </div>
             <h2 id="sheet-title" className="sheet-title">{session.title}</h2>
           </div>
-          <button className="icon-btn" onClick={onClose} aria-label="Fermer">✕</button>
         </div>
 
         <div className="sheet-meta">
