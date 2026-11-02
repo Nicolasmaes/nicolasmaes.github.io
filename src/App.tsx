@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
-  RACE, START, WEEKS, daysBetween, fmtLong, sameDay, sessionDate, type Session, type Week,
+  START, WEEKS, daysBetween, fmtLong, sameDay, sessionDate, type Session, type Week,
 } from './data'
 import { WeekView } from './components/WeekView'
 import { PlanView } from './components/PlanView'
@@ -27,7 +27,6 @@ export default function App() {
   const today = useMemo(startOfToday, [])
   const offset = daysBetween(START, today)
   const currentWeek = offset >= 0 && offset < WEEKS.length * 7 ? Math.floor(offset / 7) + 1 : 0
-  const toRace = daysBetween(today, RACE)
 
   const [tab, setTab] = useState<Tab>('semaine')
   const [weekN, setWeekN] = useState(currentWeek || (offset < 0 ? 1 : WEEKS.length))
@@ -90,10 +89,6 @@ export default function App() {
           <span className="small">Objectif</span>
           <span className="big num">4h15</span>
           <span className="small num">6'03"/km</span>
-        </div>
-        <div className="bib-count num">
-          {toRace > 0 ? <>J-{toRace}</> : toRace === 0 ? 'Jour J' : 'Marathon couru'}
-          {offset < 0 && <span> · début du plan dans {-offset} j</span>}
         </div>
       </header>
 

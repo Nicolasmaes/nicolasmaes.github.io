@@ -15,7 +15,8 @@ export function WeekView({ weekN, currentWeek, setWeekN, statusOf, onOpen, today
 }) {
   const week = WEEKS[weekN - 1]
   const stripRef = useRef<HTMLDivElement>(null)
-  const touch = useRef<{ x: number; y: number } | null>(null)
+  const sessionsRef = useRef<HTMLDivElement>(null)
+  const drag = useRef<{ x: number; y: number; dx: number; axis?: 'x' | 'y' } | null>(null)
 
   useEffect(() => {
     const strip = stripRef.current
@@ -24,6 +25,29 @@ export function WeekView({ weekN, currentWeek, setWeekN, statusOf, onOpen, today
   }, [weekN])
 
   const go = (n: number) => setWeekN(Math.min(WEEKS.length, Math.max(1, n)))
+  // Les cartes suivent le doigt, puis sortent d'un côté et la semaine suivante entre de l'autre.
+  const slide = (x: number, ms = 0) => {
+    const el = sessionsRef.current
+    if (!el) return
+    el.style.transition = ms ? `transform ${ms}ms ease-out` : 'none'
+    el.style.transform = x ? `translateX(${x}px)` : ''
+  }
+  const release = () => {
+    const d = drag.current
+    drag.current = null
+    if (!d || d.axis !== 'x') return
+    const dir = d.dx < 0 ? 1 : -1
+    const target = weekN + dir
+    if (Math.abs(d.dx) < 70 || target < 1 || target > WEEKS.length) return slide(0, 200)
+    const w = sessionsRef.current!.offsetWidth
+    slide(-dir * w, 180)
+    setTimeout(() => {
+      go(target)
+      slide(dir * w)
+      requestAnimationFrame(() => requestAnimationFrame(() => slide(0, 220)))
+    }, 180)
+  }
+
   const hasSunday = week.sessions.some((s) => s.day === 'dim')
 
   return (
@@ -63,20 +87,29 @@ export function WeekView({ weekN, currentWeek, setWeekN, statusOf, onOpen, today
 
       {todayNote && week.n === currentWeek && <div className="today-note">{todayNote}</div>}
 
-      <div
-        className="sessions"
-        onTouchStart={(e) => (touch.current = { x: e.touches[0].clientX, y: e.touches[0].clientY })}
-        onTouchEnd={(e) => {
-          if (!touch.current) return
-          const dx = e.changedTouches[0].clientX - touch.current.x
-          const dy = e.changedTouches[0].clientY - touch.current.y
-          touch.current = null
-          if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.5) go(weekN + (dx < 0 ? 1 : -1))
-        }}
-      >
-        {week.sessions.map((s) => (
-          <SessionCard key={s.day} week={week} session={s} status={statusOf(week, s)} onOpen={() => onOpen(week, s)} />
-        ))}
+      <div className="sessions-clip">
+        <div
+          className="sessions"
+          ref={sessionsRef}
+          onTouchStart={(e) => (drag.current = { x: e.touches[0].clientX, y: e.touches[0].clientY, dx: 0 })}
+          onTouchMove={(e) => {
+            const d = drag.current
+            if (!d) return
+            const dx = e.touches[0].clientX - d.x
+            const dy = e.touches[0].clientY - d.y
+            if (!d.axis && Math.max(Math.abs(dx), Math.abs(dy)) > 10) d.axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y'
+            if (d.axis !== 'x') return
+            d.dx = dx
+            const atEdge = (dx > 0 && weekN === 1) || (dx < 0 && weekN === WEEKS.length)
+            slide(atEdge ? dx / 3 : dx)
+          }}
+          onTouchEnd={release}
+          onTouchCancel={release}
+        >
+          {week.sessions.map((s) => (
+            <SessionCard key={s.day} week={week} session={s} status={statusOf(week, s)} onOpen={() => onOpen(week, s)} />
+          ))}
+        </div>
       </div>
 
       <div className="offdays">
