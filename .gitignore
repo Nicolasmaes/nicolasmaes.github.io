@@ -1,0 +1,5 @@
+node_modules
+dist
+*.tsbuildinfo
+*.pdf
+Marathon de Paris*.html
